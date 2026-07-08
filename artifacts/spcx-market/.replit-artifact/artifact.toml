@@ -1,0 +1,27 @@
+kind = "web"
+previewPath = "/"
+title = "SPCX Market"
+version = "1.0.0"
+id = "artifacts/spcx-market"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 18729
+
+[services.development]
+run = "pnpm --filter @workspace/spcx-market run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/spcx-market", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/spcx-market/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "18729"
+BASE_PATH = "/"

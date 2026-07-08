@@ -10,6 +10,8 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: investors
+    description: Investor signup operations
 paths:
   /healthz:
     get:
@@ -24,6 +26,48 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /investors:
+    post:
+      operationId: createInvestor
+      tags: [investors]
+      summary: Sign up for investor access
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InvestorInput"
+      responses:
+        "201":
+          description: Investor registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Investor"
+        "409":
+          description: Email already registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /investors/count:
+    get:
+      operationId: getInvestorCount
+      tags: [investors]
+      summary: Get number of registered investors
+      responses:
+        "200":
+          description: Investor count
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvestorCount"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +77,45 @@ components:
           type: string
       required:
         - status
-
+    Investor:
+      type: object
+      properties:
+        id:
+          type: integer
+        fullName:
+          type: string
+        email:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - fullName
+        - email
+        - createdAt
+    InvestorInput:
+      type: object
+      properties:
+        fullName:
+          type: string
+          minLength: 1
+        email:
+          type: string
+      required:
+        - fullName
+        - email
+    InvestorCount:
+      type: object
+      properties:
+        count:
+          type: integer
+      required:
+        - count
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
