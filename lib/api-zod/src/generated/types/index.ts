@@ -7,7 +7,20 @@
  */
 
 export * from './errorResponse';
+export * from './getStockHistoryParams';
+export * from './getStockHistoryPeriod';
 export * from './healthStatus';
 export * from './investor';
+export * from './investorAdmin';
+export * from './investorAdminStatus';
 export * from './investorCount';
 export * from './investorInput';
+export * from './investorStatus';
+export * from './investorStatusInput';
+export * from './investorStatusInputStatus';
+export * from './signInInput';
+export * from './signInResult';
+export * from './signInResultStatus';
+export * from './stockDataPoint';
+export * from './stockHistory';
+export * from './stockQuote';

@@ -25,10 +25,10 @@ router.post("/investors", async (req, res) => {
       id: investor.id,
       fullName: investor.fullName,
       email: investor.email,
+      status: investor.status,
       createdAt: investor.createdAt.toISOString(),
     });
   } catch (err: any) {
-    // PostgreSQL unique violation — rely on DB unique constraint as source of truth
     if (err?.code === "23505") {
       res.status(409).json({ error: "This email is already registered." });
       return;

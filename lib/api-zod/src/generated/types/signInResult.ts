@@ -5,12 +5,10 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
-import type { InvestorStatus } from './investorStatus';
+import type { SignInResultStatus } from './signInResultStatus';
 
-export interface Investor {
-  id: number;
+export interface SignInResult {
+  status: SignInResultStatus;
   fullName: string;
   email: string;
-  status: InvestorStatus;
-  createdAt: Date;
 }

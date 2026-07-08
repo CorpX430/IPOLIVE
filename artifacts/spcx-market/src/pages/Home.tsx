@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { User } from 'lucide-react';
+import { useLocation, Link } from 'wouter';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -33,6 +34,7 @@ function FadeIn({ children, delay = 0 }: { children: React.ReactNode; delay?: nu
 }
 
 export default function Home() {
+  const [, setLocation] = useLocation();
   const queryClient = useQueryClient();
   const { data: investorCountData } = useGetInvestorCount();
   const createInvestor = useCreateInvestor();
@@ -43,14 +45,15 @@ export default function Home() {
 
   const onSubmit = (data: FormValues) => {
     createInvestor.mutate({ data }, {
-      onSuccess: () => {
+      onSuccess: (resData) => {
         toast.success("Successfully registered for investor access.");
         reset();
         queryClient.invalidateQueries({ queryKey: getGetInvestorCountQueryKey() });
+        setLocation('/access-pending?email=' + encodeURIComponent(resData.email));
       },
       onError: (error) => {
-        const data = error.data as { error?: string } | null;
-        const errorMsg = data?.error ?? "Failed to register. Please try again.";
+        const errData = error.data as { error?: string } | null;
+        const errorMsg = errData?.error ?? "Failed to register. Please try again.";
         toast.error(errorMsg);
       }
     });
@@ -63,10 +66,10 @@ export default function Home() {
         <div className="font-display font-bold text-xl sm:text-2xl tracking-[0.2em] uppercase">
           SPCX MARKET, inc
         </div>
-        <button className="flex items-center gap-2 text-sm sm:text-base font-medium tracking-widest hover:text-white/70 transition-colors uppercase">
+        <Link href="/signin" className="flex items-center gap-2 text-sm sm:text-base font-medium tracking-widest hover:text-white/70 transition-colors uppercase">
           <span className="hidden sm:inline">Sign In</span>
           <User className="w-5 h-5" />
-        </button>
+        </Link>
       </header>
 
       {/* Hero Section */}

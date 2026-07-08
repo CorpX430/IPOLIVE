@@ -12,13 +12,18 @@ tags:
     description: Health operations
   - name: investors
     description: Investor signup operations
+  - name: auth
+    description: Authentication
+  - name: stock
+    description: Stock market data
+  - name: admin
+    description: Admin operations
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -26,6 +31,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
   /investors:
     post:
       operationId: createInvestor
@@ -56,6 +62,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+
   /investors/count:
     get:
       operationId: getInvestorCount
@@ -68,6 +75,123 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/InvestorCount"
+
+  /signin:
+    post:
+      operationId: signIn
+      tags: [auth]
+      summary: Sign in with email — returns investor status
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SignInInput"
+      responses:
+        "200":
+          description: Sign in result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SignInResult"
+        "404":
+          description: Email not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /stock/quote:
+    get:
+      operationId: getStockQuote
+      tags: [stock]
+      summary: Get current SPCX stock quote
+      responses:
+        "200":
+          description: Current stock quote
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StockQuote"
+
+  /stock/history:
+    get:
+      operationId: getStockHistory
+      tags: [stock]
+      summary: Get SPCX price history
+      parameters:
+        - name: period
+          in: query
+          schema:
+            type: string
+            enum: [1D, 1W, 1M, 3M, 1Y, 5Y]
+          required: false
+      responses:
+        "200":
+          description: Price history
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StockHistory"
+
+  /admin/investors:
+    get:
+      operationId: listAdminInvestors
+      tags: [admin]
+      summary: List all investors (admin only)
+      responses:
+        "200":
+          description: List of investors
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/InvestorAdmin"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /admin/investors/{id}/status:
+    patch:
+      operationId: updateInvestorStatus
+      tags: [admin]
+      summary: Update investor status (admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InvestorStatusInput"
+      responses:
+        "200":
+          description: Updated investor
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvestorAdmin"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Investor not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
 components:
   schemas:
     HealthStatus:
@@ -77,6 +201,7 @@ components:
           type: string
       required:
         - status
+
     Investor:
       type: object
       properties:
@@ -86,6 +211,9 @@ components:
           type: string
         email:
           type: string
+        status:
+          type: string
+          enum: [pending, approved, rejected]
         createdAt:
           type: string
           format: date-time
@@ -93,7 +221,31 @@ components:
         - id
         - fullName
         - email
+        - status
         - createdAt
+
+    InvestorAdmin:
+      type: object
+      properties:
+        id:
+          type: integer
+        fullName:
+          type: string
+        email:
+          type: string
+        status:
+          type: string
+          enum: [pending, approved, rejected]
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - fullName
+        - email
+        - status
+        - createdAt
+
     InvestorInput:
       type: object
       properties:
@@ -105,6 +257,7 @@ components:
       required:
         - fullName
         - email
+
     InvestorCount:
       type: object
       properties:
@@ -112,6 +265,113 @@ components:
           type: integer
       required:
         - count
+
+    InvestorStatusInput:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [pending, approved, rejected]
+      required:
+        - status
+
+    SignInInput:
+      type: object
+      properties:
+        email:
+          type: string
+      required:
+        - email
+
+    SignInResult:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [pending, approved, rejected]
+        fullName:
+          type: string
+        email:
+          type: string
+      required:
+        - status
+        - fullName
+        - email
+
+    StockQuote:
+      type: object
+      properties:
+        symbol:
+          type: string
+        price:
+          type: number
+        change:
+          type: number
+        changePct:
+          type: number
+        volume:
+          type: string
+        marketCap:
+          type: string
+        bid:
+          type: number
+        ask:
+          type: number
+        dayLow:
+          type: number
+        dayHigh:
+          type: number
+        week52High:
+          type: number
+        week52Low:
+          type: number
+        peRatio:
+          type: ["string", "null"]
+        avgVolume:
+          type: string
+        sharesOut:
+          type: string
+      required:
+        - symbol
+        - price
+        - change
+        - changePct
+        - volume
+        - marketCap
+        - bid
+        - ask
+        - dayLow
+        - dayHigh
+        - week52High
+        - week52Low
+        - peRatio
+        - avgVolume
+        - sharesOut
+
+    StockDataPoint:
+      type: object
+      properties:
+        time:
+          type: string
+        price:
+          type: number
+      required:
+        - time
+        - price
+
+    StockHistory:
+      type: object
+      properties:
+        period:
+          type: string
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/StockDataPoint"
+      required:
+        - period
+        - data
+
     ErrorResponse:
       type: object
       properties:

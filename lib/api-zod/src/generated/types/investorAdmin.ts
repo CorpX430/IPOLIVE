@@ -5,12 +5,12 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
-import type { InvestorStatus } from './investorStatus';
+import type { InvestorAdminStatus } from './investorAdminStatus';
 
-export interface Investor {
+export interface InvestorAdmin {
   id: number;
   fullName: string;
   email: string;
-  status: InvestorStatus;
+  status: InvestorAdminStatus;
   createdAt: Date;
 }

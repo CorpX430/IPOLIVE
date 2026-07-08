@@ -21,10 +21,17 @@ import type {
 
 import type {
   ErrorResponse,
+  GetStockHistoryParams,
   HealthStatus,
   Investor,
+  InvestorAdmin,
   InvestorCount,
-  InvestorInput
+  InvestorInput,
+  InvestorStatusInput,
+  SignInInput,
+  SignInResult,
+  StockHistory,
+  StockQuote
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
@@ -63,7 +70,6 @@ export const getHealthCheckUrl = () => {
 }
 
 /**
- * Returns server health status
  * @summary Health check
  */
 export const healthCheck = async ( options?: RequestInit): Promise<HealthStatus> => {
@@ -279,4 +285,385 @@ export function useGetInvestorCount<TData = Awaited<ReturnType<typeof getInvesto
 
 
 
+
+export const getSignInUrl = () => {
+
+
+
+
+  return `/api/signin`
+}
+
+/**
+ * @summary Sign in with email — returns investor status
+ */
+export const signIn = async (signInInput: SignInInput, options?: RequestInit): Promise<SignInResult> => {
+
+  return customFetch<SignInResult>(getSignInUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(signInInput)
+  }
+);}
+
+
+
+
+
+export const getSignInMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof signIn>>, TError,{data: BodyType<SignInInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof signIn>>, TError,{data: BodyType<SignInInput>}, TContext> => {
+
+const mutationKey = ['signIn'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof signIn>>, {data: BodyType<SignInInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  signIn(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SignInMutationResult = NonNullable<Awaited<ReturnType<typeof signIn>>>
+    export type SignInMutationBody = BodyType<SignInInput>
+    export type SignInMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Sign in with email — returns investor status
+ */
+export const useSignIn = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof signIn>>, TError,{data: BodyType<SignInInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof signIn>>,
+        TError,
+        {data: BodyType<SignInInput>},
+        TContext
+      > => {
+      return useMutation(getSignInMutationOptions(options));
+    }
+
+export const getGetStockQuoteUrl = () => {
+
+
+
+
+  return `/api/stock/quote`
+}
+
+/**
+ * @summary Get current SPCX stock quote
+ */
+export const getStockQuote = async ( options?: RequestInit): Promise<StockQuote> => {
+
+  return customFetch<StockQuote>(getGetStockQuoteUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetStockQuoteQueryKey = () => {
+    return [
+    `/api/stock/quote`
+    ] as const;
+    }
+
+
+export const getGetStockQuoteQueryOptions = <TData = Awaited<ReturnType<typeof getStockQuote>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getStockQuote>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetStockQuoteQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getStockQuote>>> = ({ signal }) => getStockQuote({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getStockQuote>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetStockQuoteQueryResult = NonNullable<Awaited<ReturnType<typeof getStockQuote>>>
+export type GetStockQuoteQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get current SPCX stock quote
+ */
+
+export function useGetStockQuote<TData = Awaited<ReturnType<typeof getStockQuote>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getStockQuote>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetStockQuoteQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetStockHistoryUrl = (params?: GetStockHistoryParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/stock/history?${stringifiedParams}` : `/api/stock/history`
+}
+
+/**
+ * @summary Get SPCX price history
+ */
+export const getStockHistory = async (params?: GetStockHistoryParams, options?: RequestInit): Promise<StockHistory> => {
+
+  return customFetch<StockHistory>(getGetStockHistoryUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetStockHistoryQueryKey = (params?: GetStockHistoryParams,) => {
+    return [
+    `/api/stock/history`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetStockHistoryQueryOptions = <TData = Awaited<ReturnType<typeof getStockHistory>>, TError = ErrorType<unknown>>(params?: GetStockHistoryParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getStockHistory>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetStockHistoryQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getStockHistory>>> = ({ signal }) => getStockHistory(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getStockHistory>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetStockHistoryQueryResult = NonNullable<Awaited<ReturnType<typeof getStockHistory>>>
+export type GetStockHistoryQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get SPCX price history
+ */
+
+export function useGetStockHistory<TData = Awaited<ReturnType<typeof getStockHistory>>, TError = ErrorType<unknown>>(
+ params?: GetStockHistoryParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getStockHistory>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetStockHistoryQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getListAdminInvestorsUrl = () => {
+
+
+
+
+  return `/api/admin/investors`
+}
+
+/**
+ * @summary List all investors (admin only)
+ */
+export const listAdminInvestors = async ( options?: RequestInit): Promise<InvestorAdmin[]> => {
+
+  return customFetch<InvestorAdmin[]>(getListAdminInvestorsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListAdminInvestorsQueryKey = () => {
+    return [
+    `/api/admin/investors`
+    ] as const;
+    }
+
+
+export const getListAdminInvestorsQueryOptions = <TData = Awaited<ReturnType<typeof listAdminInvestors>>, TError = ErrorType<ErrorResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAdminInvestors>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListAdminInvestorsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAdminInvestors>>> = ({ signal }) => listAdminInvestors({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAdminInvestors>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListAdminInvestorsQueryResult = NonNullable<Awaited<ReturnType<typeof listAdminInvestors>>>
+export type ListAdminInvestorsQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary List all investors (admin only)
+ */
+
+export function useListAdminInvestors<TData = Awaited<ReturnType<typeof listAdminInvestors>>, TError = ErrorType<ErrorResponse>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listAdminInvestors>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListAdminInvestorsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getUpdateInvestorStatusUrl = (id: number,) => {
+
+
+
+
+  return `/api/admin/investors/${id}/status`
+}
+
+/**
+ * @summary Update investor status (admin only)
+ */
+export const updateInvestorStatus = async (id: number,
+    investorStatusInput: InvestorStatusInput, options?: RequestInit): Promise<InvestorAdmin> => {
+
+  return customFetch<InvestorAdmin>(getUpdateInvestorStatusUrl(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(investorStatusInput)
+  }
+);}
+
+
+
+
+
+export const getUpdateInvestorStatusMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateInvestorStatus>>, TError,{id: number;data: BodyType<InvestorStatusInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateInvestorStatus>>, TError,{id: number;data: BodyType<InvestorStatusInput>}, TContext> => {
+
+const mutationKey = ['updateInvestorStatus'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateInvestorStatus>>, {id: number;data: BodyType<InvestorStatusInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateInvestorStatus(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateInvestorStatusMutationResult = NonNullable<Awaited<ReturnType<typeof updateInvestorStatus>>>
+    export type UpdateInvestorStatusMutationBody = BodyType<InvestorStatusInput>
+    export type UpdateInvestorStatusMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Update investor status (admin only)
+ */
+export const useUpdateInvestorStatus = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateInvestorStatus>>, TError,{id: number;data: BodyType<InvestorStatusInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateInvestorStatus>>,
+        TError,
+        {id: number;data: BodyType<InvestorStatusInput>},
+        TContext
+      > => {
+      return useMutation(getUpdateInvestorStatusMutationOptions(options));
+    }
 

@@ -9,7 +9,6 @@ import * as zod from 'zod';
 
 
 /**
- * Returns server health status
  * @summary Health check
  */
 export const HealthCheckResponse = zod.object({
@@ -32,6 +31,7 @@ export const CreateInvestorResponse = zod.object({
   "id": zod.number(),
   "fullName": zod.string(),
   "email": zod.string(),
+  "status": zod.enum(['pending', 'approved', 'rejected']),
   "createdAt": zod.coerce.date()
 })
 
@@ -41,6 +41,91 @@ export const CreateInvestorResponse = zod.object({
  */
 export const GetInvestorCountResponse = zod.object({
   "count": zod.number()
+})
+
+
+/**
+ * @summary Sign in with email — returns investor status
+ */
+export const SignInBody = zod.object({
+  "email": zod.string()
+})
+
+export const SignInResponse = zod.object({
+  "status": zod.enum(['pending', 'approved', 'rejected']),
+  "fullName": zod.string(),
+  "email": zod.string()
+})
+
+
+/**
+ * @summary Get current SPCX stock quote
+ */
+export const GetStockQuoteResponse = zod.object({
+  "symbol": zod.string(),
+  "price": zod.number(),
+  "change": zod.number(),
+  "changePct": zod.number(),
+  "volume": zod.string(),
+  "marketCap": zod.string(),
+  "bid": zod.number(),
+  "ask": zod.number(),
+  "dayLow": zod.number(),
+  "dayHigh": zod.number(),
+  "week52High": zod.number(),
+  "week52Low": zod.number(),
+  "peRatio": zod.string().nullable(),
+  "avgVolume": zod.string(),
+  "sharesOut": zod.string()
+})
+
+
+/**
+ * @summary Get SPCX price history
+ */
+export const GetStockHistoryQueryParams = zod.object({
+  "period": zod.enum(['1D', '1W', '1M', '3M', '1Y', '5Y']).optional()
+})
+
+export const GetStockHistoryResponse = zod.object({
+  "period": zod.string(),
+  "data": zod.array(zod.object({
+  "time": zod.string(),
+  "price": zod.number()
+}))
+})
+
+
+/**
+ * @summary List all investors (admin only)
+ */
+export const ListAdminInvestorsResponseItem = zod.object({
+  "id": zod.number(),
+  "fullName": zod.string(),
+  "email": zod.string(),
+  "status": zod.enum(['pending', 'approved', 'rejected']),
+  "createdAt": zod.coerce.date()
+})
+export const ListAdminInvestorsResponse = zod.array(ListAdminInvestorsResponseItem)
+
+
+/**
+ * @summary Update investor status (admin only)
+ */
+export const UpdateInvestorStatusParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdateInvestorStatusBody = zod.object({
+  "status": zod.enum(['pending', 'approved', 'rejected'])
+})
+
+export const UpdateInvestorStatusResponse = zod.object({
+  "id": zod.number(),
+  "fullName": zod.string(),
+  "email": zod.string(),
+  "status": zod.enum(['pending', 'approved', 'rejected']),
+  "createdAt": zod.coerce.date()
 })
 
 

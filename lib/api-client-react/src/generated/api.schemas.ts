@@ -9,10 +9,37 @@ export interface HealthStatus {
   status: string;
 }
 
+export type InvestorStatus = typeof InvestorStatus[keyof typeof InvestorStatus];
+
+
+export const InvestorStatus = {
+  pending: 'pending',
+  approved: 'approved',
+  rejected: 'rejected',
+} as const;
+
 export interface Investor {
   id: number;
   fullName: string;
   email: string;
+  status: InvestorStatus;
+  createdAt: string;
+}
+
+export type InvestorAdminStatus = typeof InvestorAdminStatus[keyof typeof InvestorAdminStatus];
+
+
+export const InvestorAdminStatus = {
+  pending: 'pending',
+  approved: 'approved',
+  rejected: 'rejected',
+} as const;
+
+export interface InvestorAdmin {
+  id: number;
+  fullName: string;
+  email: string;
+  status: InvestorAdminStatus;
   createdAt: string;
 }
 
@@ -26,7 +53,84 @@ export interface InvestorCount {
   count: number;
 }
 
+export type InvestorStatusInputStatus = typeof InvestorStatusInputStatus[keyof typeof InvestorStatusInputStatus];
+
+
+export const InvestorStatusInputStatus = {
+  pending: 'pending',
+  approved: 'approved',
+  rejected: 'rejected',
+} as const;
+
+export interface InvestorStatusInput {
+  status: InvestorStatusInputStatus;
+}
+
+export interface SignInInput {
+  email: string;
+}
+
+export type SignInResultStatus = typeof SignInResultStatus[keyof typeof SignInResultStatus];
+
+
+export const SignInResultStatus = {
+  pending: 'pending',
+  approved: 'approved',
+  rejected: 'rejected',
+} as const;
+
+export interface SignInResult {
+  status: SignInResultStatus;
+  fullName: string;
+  email: string;
+}
+
+export interface StockQuote {
+  symbol: string;
+  price: number;
+  change: number;
+  changePct: number;
+  volume: string;
+  marketCap: string;
+  bid: number;
+  ask: number;
+  dayLow: number;
+  dayHigh: number;
+  week52High: number;
+  week52Low: number;
+  /** @nullable */
+  peRatio: string | null;
+  avgVolume: string;
+  sharesOut: string;
+}
+
+export interface StockDataPoint {
+  time: string;
+  price: number;
+}
+
+export interface StockHistory {
+  period: string;
+  data: StockDataPoint[];
+}
+
 export interface ErrorResponse {
   error: string;
 }
+
+export type GetStockHistoryParams = {
+period?: GetStockHistoryPeriod;
+};
+
+export type GetStockHistoryPeriod = typeof GetStockHistoryPeriod[keyof typeof GetStockHistoryPeriod];
+
+
+export const GetStockHistoryPeriod = {
+  '1D': '1D',
+  '1W': '1W',
+  '1M': '1M',
+  '3M': '3M',
+  '1Y': '1Y',
+  '5Y': '5Y',
+} as const;
 
