@@ -13,4 +13,6 @@ export interface InvestorAdmin {
   email: string;
   status: InvestorAdminStatus;
   createdAt: Date;
+  shares: string;
+  avgCost: string;
 }

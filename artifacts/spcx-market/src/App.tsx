@@ -6,6 +6,9 @@ import AccessPending from './pages/AccessPending';
 import SignIn from './pages/SignIn';
 import Dashboard from './pages/Dashboard';
 import Admin from './pages/Admin';
+import Management from './pages/Management';
+import Support from './pages/Support';
+import Orders from './pages/Orders';
 
 const queryClient = new QueryClient();
 
@@ -17,6 +20,9 @@ function Router() {
       <Route path="/signin" component={SignIn} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/admin" component={Admin} />
+      <Route path="/management" component={Management} />
+      <Route path="/support" component={Support} />
+      <Route path="/orders" component={Orders} />
       <Route>
         <div className="flex h-screen items-center justify-center font-display text-4xl text-white bg-[#050a0f]">404 NOT FOUND</div>
       </Route>

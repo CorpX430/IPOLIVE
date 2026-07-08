@@ -97,6 +97,57 @@ export const GetStockHistoryResponse = zod.object({
 
 
 /**
+ * @summary Get holdings for the current user (by email query param)
+ */
+export const GetHoldingsQueryParams = zod.object({
+  "email": zod.coerce.string()
+})
+
+export const GetHoldingsResponse = zod.object({
+  "investorId": zod.number(),
+  "shares": zod.string(),
+  "avgCost": zod.string(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Submit a deposit request
+ */
+
+
+
+export const CreateDepositBody = zod.object({
+  "email": zod.string(),
+  "amount": zod.number().min(1),
+  "method": zod.enum(['card', 'crypto']),
+  "coin": zod.enum(['BTC', 'ETH', 'DOGE']).optional()
+})
+
+export const CreateDepositResponse = zod.object({
+  "id": zod.number(),
+  "investorId": zod.number(),
+  "email": zod.string(),
+  "amount": zod.string(),
+  "method": zod.enum(['card', 'crypto']),
+  "coin": zod.string().nullable(),
+  "status": zod.enum(['pending', 'completed', 'failed']),
+  "createdAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Get public crypto deposit addresses
+ */
+export const GetDepositAddressesResponseItem = zod.object({
+  "coin": zod.string(),
+  "address": zod.string(),
+  "updatedAt": zod.coerce.date()
+})
+export const GetDepositAddressesResponse = zod.array(GetDepositAddressesResponseItem)
+
+
+/**
  * @summary List all investors (admin only)
  */
 export const ListAdminInvestorsResponseItem = zod.object({
@@ -104,7 +155,9 @@ export const ListAdminInvestorsResponseItem = zod.object({
   "fullName": zod.string(),
   "email": zod.string(),
   "status": zod.enum(['pending', 'approved', 'rejected']),
-  "createdAt": zod.coerce.date()
+  "createdAt": zod.coerce.date(),
+  "shares": zod.string(),
+  "avgCost": zod.string()
 })
 export const ListAdminInvestorsResponse = zod.array(ListAdminInvestorsResponseItem)
 
@@ -125,7 +178,85 @@ export const UpdateInvestorStatusResponse = zod.object({
   "fullName": zod.string(),
   "email": zod.string(),
   "status": zod.enum(['pending', 'approved', 'rejected']),
+  "createdAt": zod.coerce.date(),
+  "shares": zod.string(),
+  "avgCost": zod.string()
+})
+
+
+/**
+ * @summary Manually credit shares to an investor (admin only)
+ */
+export const CreditInvestorParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const creditInvestorBodySharesMin = 0;
+
+export const creditInvestorBodyPricePerShareMin = 0;
+
+
+
+export const CreditInvestorBody = zod.object({
+  "shares": zod.number().min(creditInvestorBodySharesMin),
+  "pricePerShare": zod.number().min(creditInvestorBodyPricePerShareMin)
+})
+
+export const CreditInvestorResponse = zod.object({
+  "investorId": zod.number(),
+  "shares": zod.string(),
+  "avgCost": zod.string(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary List all deposits (admin only)
+ */
+export const ListAdminDepositsResponseItem = zod.object({
+  "id": zod.number(),
+  "investorId": zod.number(),
+  "fullName": zod.string(),
+  "email": zod.string(),
+  "amount": zod.string(),
+  "method": zod.enum(['card', 'crypto']),
+  "coin": zod.string().nullable(),
+  "status": zod.enum(['pending', 'completed', 'failed']),
   "createdAt": zod.coerce.date()
+})
+export const ListAdminDepositsResponse = zod.array(ListAdminDepositsResponseItem)
+
+
+/**
+ * @summary Get all deposit addresses (admin only)
+ */
+export const AdminGetDepositAddressesResponseItem = zod.object({
+  "coin": zod.string(),
+  "address": zod.string(),
+  "updatedAt": zod.coerce.date()
+})
+export const AdminGetDepositAddressesResponse = zod.array(AdminGetDepositAddressesResponseItem)
+
+
+/**
+ * @summary Update a deposit address (admin only)
+ */
+export const UpdateDepositAddressParams = zod.object({
+  "coin": zod.coerce.string()
+})
+
+export const updateDepositAddressBodyAddressMin = 10;
+
+
+
+export const UpdateDepositAddressBody = zod.object({
+  "address": zod.string().min(updateDepositAddressBodyAddressMin)
+})
+
+export const UpdateDepositAddressResponse = zod.object({
+  "coin": zod.string(),
+  "address": zod.string(),
+  "updatedAt": zod.coerce.date()
 })
 
 

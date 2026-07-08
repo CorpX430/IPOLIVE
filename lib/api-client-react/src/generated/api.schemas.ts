@@ -41,6 +41,8 @@ export interface InvestorAdmin {
   email: string;
   status: InvestorAdminStatus;
   createdAt: string;
+  shares: string;
+  avgCost: string;
 }
 
 export interface InvestorInput {
@@ -66,6 +68,13 @@ export interface InvestorStatusInput {
   status: InvestorStatusInputStatus;
 }
 
+export interface CreditInput {
+  /** @minimum 0 */
+  shares: number;
+  /** @minimum 0 */
+  pricePerShare: number;
+}
+
 export interface SignInInput {
   email: string;
 }
@@ -83,6 +92,108 @@ export interface SignInResult {
   status: SignInResultStatus;
   fullName: string;
   email: string;
+}
+
+export interface Holdings {
+  investorId: number;
+  shares: string;
+  avgCost: string;
+  updatedAt: string;
+}
+
+export type CreateDepositInputMethod = typeof CreateDepositInputMethod[keyof typeof CreateDepositInputMethod];
+
+
+export const CreateDepositInputMethod = {
+  card: 'card',
+  crypto: 'crypto',
+} as const;
+
+export type CreateDepositInputCoin = typeof CreateDepositInputCoin[keyof typeof CreateDepositInputCoin];
+
+
+export const CreateDepositInputCoin = {
+  BTC: 'BTC',
+  ETH: 'ETH',
+  DOGE: 'DOGE',
+} as const;
+
+export interface CreateDepositInput {
+  email: string;
+  /** @minimum 1 */
+  amount: number;
+  method: CreateDepositInputMethod;
+  coin?: CreateDepositInputCoin;
+}
+
+export type DepositRecordMethod = typeof DepositRecordMethod[keyof typeof DepositRecordMethod];
+
+
+export const DepositRecordMethod = {
+  card: 'card',
+  crypto: 'crypto',
+} as const;
+
+export type DepositRecordStatus = typeof DepositRecordStatus[keyof typeof DepositRecordStatus];
+
+
+export const DepositRecordStatus = {
+  pending: 'pending',
+  completed: 'completed',
+  failed: 'failed',
+} as const;
+
+export interface DepositRecord {
+  id: number;
+  investorId: number;
+  email: string;
+  amount: string;
+  method: DepositRecordMethod;
+  /** @nullable */
+  coin: string | null;
+  status: DepositRecordStatus;
+  createdAt: string;
+}
+
+export type DepositAdminMethod = typeof DepositAdminMethod[keyof typeof DepositAdminMethod];
+
+
+export const DepositAdminMethod = {
+  card: 'card',
+  crypto: 'crypto',
+} as const;
+
+export type DepositAdminStatus = typeof DepositAdminStatus[keyof typeof DepositAdminStatus];
+
+
+export const DepositAdminStatus = {
+  pending: 'pending',
+  completed: 'completed',
+  failed: 'failed',
+} as const;
+
+export interface DepositAdmin {
+  id: number;
+  investorId: number;
+  fullName: string;
+  email: string;
+  amount: string;
+  method: DepositAdminMethod;
+  /** @nullable */
+  coin: string | null;
+  status: DepositAdminStatus;
+  createdAt: string;
+}
+
+export interface DepositAddress {
+  coin: string;
+  address: string;
+  updatedAt: string;
+}
+
+export interface UpdateDepositAddressInput {
+  /** @minLength 10 */
+  address: string;
 }
 
 export interface StockQuote {
@@ -133,4 +244,8 @@ export const GetStockHistoryPeriod = {
   '1Y': '1Y',
   '5Y': '5Y',
 } as const;
+
+export type GetHoldingsParams = {
+email: string;
+};
 
