@@ -69,29 +69,34 @@ export default function Home() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative h-[100dvh] w-full flex flex-col justify-end px-6 pb-12 sm:px-12 sm:pb-24 overflow-hidden">
+      <section className="relative h-[100dvh] w-full overflow-hidden flex flex-col justify-end">
+        {/* Background image pinned to the top so the rocket stays in the upper half */}
         <div className="absolute inset-0 z-0">
-          <img 
-            src={rocketHero} 
-            alt="Rocket Launch" 
+          <img
+            src={rocketHero}
+            alt="Rocket Launch"
             className="w-full h-full object-cover object-center"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#050a0f] via-[#050a0f]/60 to-transparent" />
+          {/* Strong gradient: fully opaque at the bottom, fading out by ~55% up the frame */}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#050a0f] from-[35%] via-[#050a0f]/75 via-[55%] to-transparent" />
+          {/* Left vignette so text always sits on solid dark */}
+          <div className="absolute inset-0 bg-gradient-to-r from-[#050a0f]/80 via-transparent to-transparent" />
         </div>
-        
-        <div className="relative z-10 max-w-5xl mx-auto w-full">
+
+        {/* Text anchored to the bottom-left, well below the rocket glow */}
+        <div className="relative z-10 w-full px-6 pb-14 sm:px-12 sm:pb-20 max-w-5xl mx-auto">
           <FadeIn>
-            <h1 className="font-display text-5xl sm:text-7xl md:text-8xl lg:text-[10rem] font-bold uppercase leading-[0.9] tracking-tight">
-              Investor<br/>Relations
+            <h1 className="font-display text-[13vw] sm:text-7xl md:text-8xl lg:text-[9rem] font-bold uppercase leading-[0.88] tracking-tight drop-shadow-[0_2px_24px_rgba(0,0,0,0.9)]">
+              INVESTOR<br />RELATIONS
             </h1>
           </FadeIn>
           <FadeIn delay={0.2}>
-            <p className="mt-4 text-lg sm:text-2xl font-light tracking-[0.2em] text-blue-50/90 uppercase">
+            <p className="mt-5 text-base sm:text-xl font-light tracking-[0.25em] text-white/70 uppercase">
               Now Trading · SPCX
             </p>
           </FadeIn>
           <FadeIn delay={0.4}>
-            <div className="flex gap-8 mt-12 font-medium tracking-[0.15em] text-sm sm:text-base">
+            <div className="flex gap-8 mt-10 font-medium tracking-[0.15em] text-sm sm:text-base">
               <a href="#prospectus" className="border-b border-white/40 pb-1 hover:border-white transition-colors uppercase">
                 Prospectus
               </a>
