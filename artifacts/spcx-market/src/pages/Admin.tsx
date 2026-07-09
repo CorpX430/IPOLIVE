@@ -11,6 +11,8 @@ export default function Admin() {
   const [investors, setInvestors] = useState<any[]>([]);
   const [deposits, setDeposits] = useState<any[]>([]);
   const [addresses, setAddresses] = useState<any[]>([{coin: 'BTC', address: ''}, {coin: 'ETH', address: ''}, {coin: 'DOGE', address: ''}]);
+  // Controlled edit state for address inputs: { BTC: '...', ETH: '...', DOGE: '...' }
+  const [editAddresses, setEditAddresses] = useState<Record<string, string>>({ BTC: '', ETH: '', DOGE: '' });
   
   // Credit state
   const [creditUser, setCreditUser] = useState('');
@@ -42,7 +44,13 @@ export default function Admin() {
       const res = await fetch('/api/deposit-addresses');
       if (res.ok) {
         const data = await res.json();
-        if (data && data.length) setAddresses(data);
+        if (data && data.length) {
+          setAddresses(data);
+          // Sync controlled inputs with fetched values
+          const map: Record<string, string> = {};
+          data.forEach((a: any) => { map[a.coin] = a.address; });
+          setEditAddresses(prev => ({ ...prev, ...map }));
+        }
       }
     } catch (e) {}
   };
@@ -373,34 +381,25 @@ export default function Admin() {
             <div className="p-8">
               <h2 className="text-xl font-bold font-display uppercase tracking-widest mb-6">Manage Crypto Addresses</h2>
               <div className="space-y-4 max-w-3xl">
-                {['BTC', 'ETH', 'DOGE'].map(coinName => {
-                  const addrObj = addresses.find(a => a.coin === coinName) || { address: '' };
-                  return (
-                    <div key={coinName} className="bg-[#111827] border border-white/10 rounded-lg p-4 flex flex-col md:flex-row items-start md:items-center gap-4">
-                      <div className="w-16 font-display font-bold tracking-widest text-lg">{coinName}</div>
-                      <input 
-                        type="text"
-                        defaultValue={addrObj.address}
-                        placeholder={`Enter ${coinName} address`}
-                        className="flex-1 bg-black/50 border border-white/20 rounded px-3 py-2 text-sm font-mono text-white/80 w-full focus:outline-none focus:border-white/50"
-                        onBlur={e => {
-                          if (e.target.value !== addrObj.address) {
-                            handleSaveAddress(coinName, e.target.value);
-                          }
-                        }}
-                      />
-                      <button 
-                        onClick={(e) => {
-                          const input = e.currentTarget.previousElementSibling as HTMLInputElement;
-                          handleSaveAddress(coinName, input.value);
-                        }}
-                        className="text-xs bg-white/10 hover:bg-white/20 px-4 py-2 font-display tracking-widest uppercase rounded cursor-pointer transition-colors"
-                      >
-                        Save
-                      </button>
-                    </div>
-                  );
-                })}
+                {['BTC', 'ETH', 'DOGE'].map(coinName => (
+                  <div key={coinName} className="bg-[#111827] border border-white/10 rounded-lg p-4 flex flex-col md:flex-row items-start md:items-center gap-4">
+                    <div className="w-16 font-display font-bold tracking-widest text-lg shrink-0">{coinName}</div>
+                    <input
+                      type="text"
+                      value={editAddresses[coinName] ?? ''}
+                      onChange={e => setEditAddresses(prev => ({ ...prev, [coinName]: e.target.value }))}
+                      placeholder={`Enter ${coinName} deposit address`}
+                      className="flex-1 bg-black/50 border border-white/20 rounded px-3 py-2 text-sm font-mono text-white/80 w-full focus:outline-none focus:border-white/50 min-w-0"
+                    />
+                    <button
+                      onClick={() => handleSaveAddress(coinName, editAddresses[coinName] ?? '')}
+                      disabled={!editAddresses[coinName] || editAddresses[coinName].length < 10}
+                      className="text-xs bg-[#1a8a4a] hover:bg-[#1a9a52] disabled:opacity-40 disabled:cursor-not-allowed px-4 py-2 font-display tracking-widest uppercase rounded cursor-pointer transition-colors shrink-0"
+                    >
+                      Save
+                    </button>
+                  </div>
+                ))}
               </div>
             </div>
           )}

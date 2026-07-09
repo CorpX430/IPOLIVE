@@ -8,13 +8,17 @@ import { useCreateDeposit, useGetDepositAddresses, getGetDepositAddressesQueryKe
 import SideNav from '../components/SideNav';
 import { toast } from 'sonner';
 
+const PRICE_PER_SHARE = 147.62;
+
 export default function Orders() {
   const [, setLocation] = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [step, setStep] = useState<1 | 2 | '3a' | '3b' | 'success'>(1);
-  const [amount, setAmount] = useState<string>('1593.55');
+  const [shares, setShares] = useState(10);
   const [method, setMethod] = useState<'card' | 'crypto'>('card');
   const [coin, setCoin] = useState<CreateDepositInputCoin>('BTC' as CreateDepositInputCoin);
+
+  const amount = (shares * PRICE_PER_SHARE).toFixed(2);
   
   // Card details
   const [cardName, setCardName] = useState('');
@@ -65,6 +69,7 @@ export default function Orders() {
 
   const submitDeposit = () => {
     const numAmount = parseFloat(amount);
+    // shares is always valid since it's controlled via +/- buttons
     if (isNaN(numAmount) || numAmount < 1) {
       toast.error('Invalid amount');
       return;
@@ -130,21 +135,53 @@ export default function Orders() {
               exit={{ opacity: 0, x: 20 }}
               className="bg-[#111827] border border-white/5 rounded-2xl p-8 shadow-2xl w-full"
             >
-              <h1 className="text-2xl font-bold font-display uppercase tracking-widest text-center mb-8">Invest in SPCX</h1>
-              <div className="flex justify-center items-end gap-1 mb-8">
-                <span className="text-4xl font-display font-bold text-white/50 mb-1">$</span>
-                <input
-                  type="number"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  className="bg-transparent text-6xl font-bold font-display tracking-tight text-white w-48 text-center focus:outline-none placeholder:text-white/20"
-                  placeholder="0.00"
-                />
+              <h1 className="text-2xl font-bold font-display uppercase tracking-widest text-center mb-2">Invest in SPCX</h1>
+              <p className="text-center text-white/40 font-display tracking-widest text-xs uppercase mb-8">
+                ${PRICE_PER_SHARE.toFixed(2)} per share
+              </p>
+
+              {/* Share quantity picker */}
+              <div className="flex items-center justify-center gap-6 mb-6">
+                <button
+                  onClick={() => setShares(s => Math.max(1, s - 1))}
+                  className="w-12 h-12 rounded-full border border-white/20 text-white/70 hover:text-white hover:border-white/50 text-2xl font-bold flex items-center justify-center transition-colors cursor-pointer select-none"
+                >
+                  −
+                </button>
+                <div className="text-center">
+                  <div className="text-7xl font-bold font-display tracking-tight text-white leading-none">{shares}</div>
+                  <div className="text-xs text-white/40 font-display tracking-widest uppercase mt-2">Shares</div>
+                </div>
+                <button
+                  onClick={() => setShares(s => s + 1)}
+                  className="w-12 h-12 rounded-full border border-white/20 text-white/70 hover:text-white hover:border-white/50 text-2xl font-bold flex items-center justify-center transition-colors cursor-pointer select-none"
+                >
+                  +
+                </button>
               </div>
-              <button 
+
+              {/* Quick presets */}
+              <div className="flex justify-center gap-2 mb-8">
+                {[10, 25, 50, 100].map(n => (
+                  <button
+                    key={n}
+                    onClick={() => setShares(n)}
+                    className={`px-3 py-1 rounded-full text-xs font-display tracking-widest uppercase transition-colors cursor-pointer ${shares === n ? 'bg-white/10 text-white border border-white/20' : 'text-white/40 hover:text-white/70 border border-white/10'}`}
+                  >
+                    {n}
+                  </button>
+                ))}
+              </div>
+
+              {/* Total */}
+              <div className="bg-black/30 rounded-xl px-6 py-4 flex items-center justify-between mb-8 border border-white/5">
+                <span className="text-sm text-white/50 font-display tracking-widest uppercase">Total</span>
+                <span className="text-2xl font-bold font-display tracking-wider">${amount}</span>
+              </div>
+
+              <button
                 onClick={() => setStep(2)}
-                disabled={parseFloat(amount) < 1 || isNaN(parseFloat(amount))}
-                className="w-full bg-[#1a8a4a] hover:bg-[#1a9a52] disabled:opacity-50 disabled:cursor-not-allowed text-white font-display font-bold tracking-widest uppercase py-4 rounded-xl transition-colors cursor-pointer"
+                className="w-full bg-[#1a8a4a] hover:bg-[#1a9a52] text-white font-display font-bold tracking-widest uppercase py-4 rounded-xl transition-colors cursor-pointer"
               >
                 Continue
               </button>
