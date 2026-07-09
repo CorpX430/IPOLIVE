@@ -15,7 +15,7 @@ const navItems = [
   { label: 'Updates', path: '/dashboard', icon: Bell },
   { label: 'Management', path: '/management', icon: Users },
   { label: 'Support', path: '/support', icon: Mail },
-  { label: 'Settings', path: '/dashboard', icon: Settings },
+  { label: 'Settings', path: '/settings', icon: Settings },
 ];
 
 export default function SideNav({ open, onClose, onSignOut }: SideNavProps) {
