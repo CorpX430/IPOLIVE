@@ -6,8 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
-import { useCreateInvestor, useGetInvestorCount, getGetInvestorCountQueryKey } from '@workspace/api-client-react';
-import { useQueryClient } from '@tanstack/react-query';
+import { useCreateInvestor } from '@workspace/api-client-react';
 import * as AccordionPrimitive from '@radix-ui/react-accordion';
 import rocketHero from '@assets/IMG_0130_1783542753570.png';
 
@@ -35,8 +34,6 @@ function FadeIn({ children, delay = 0 }: { children: React.ReactNode; delay?: nu
 
 export default function Home() {
   const [, setLocation] = useLocation();
-  const queryClient = useQueryClient();
-  const { data: investorCountData } = useGetInvestorCount();
   const createInvestor = useCreateInvestor();
 
   const { register, handleSubmit, formState: { errors }, reset } = useForm<FormValues>({
@@ -48,7 +45,6 @@ export default function Home() {
       onSuccess: (resData) => {
         toast.success("Successfully registered for investor access.");
         reset();
-        queryClient.invalidateQueries({ queryKey: getGetInvestorCountQueryKey() });
         setLocation('/access-pending?email=' + encodeURIComponent(resData.email));
       },
       onError: (error) => {
@@ -146,13 +142,6 @@ export default function Home() {
               </button>
             </form>
             
-            {investorCountData !== undefined && (
-              <div className="mt-12 text-center">
-                <p className="text-white/40 text-sm sm:text-base tracking-[0.2em] uppercase font-medium">
-                  {investorCountData.count.toLocaleString()} investors registered
-                </p>
-              </div>
-            )}
           </FadeIn>
         </div>
       </section>
