@@ -3,17 +3,26 @@ import { db, investorsTable, holdingsTable, depositsTable, depositAddressesTable
 import { eq, desc } from "drizzle-orm";
 import { z } from "zod";
 
-const ADMIN_PASSWORD = "$10$10$10";
-
 const router = Router();
 
 function checkAdminAuth(req: any, res: any): boolean {
   const pw = req.headers["x-admin-password"];
-  if (pw !== ADMIN_PASSWORD) {
-    res.status(401).json({ error: "Unauthorized." });
-    return false;
+  const adminSecret = process.env.ADMIN_SECRET;
+  const token = req.headers["x-admin-token"] || req.headers["authorization"]?.replace("Bearer ", "");
+  const adminToken = process.env.ADMIN_TOKEN;
+  
+  // Check password (x-admin-password header)
+  if (pw && pw === adminSecret) {
+    return true;
   }
-  return true;
+  
+  // Check token (x-admin-token header or Authorization: Bearer token)
+  if (token && token === adminToken) {
+    return true;
+  }
+  
+  res.status(401).json({ error: "Unauthorized." });
+  return false;
 }
 
 // GET /api/admin/investors — list all investors with holdings
